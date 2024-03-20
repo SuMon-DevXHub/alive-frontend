@@ -99,7 +99,14 @@ const CopyLinkModal = ({
                   />
                 </span>
               </div>
-              <button className="whitespace-nowrap">
+              <button
+                className="whitespace-nowrap"
+                onClick={() => {
+                  // Copy the text inside the text field
+                  navigator.clipboard.writeText(url);
+                  alert("Link copied to clipboard");
+                }}
+              >
                 <div className="flex items-center justify-center">
                   <div className="relative inline-block px-4 py-2 font-medium group">
                     <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#2d1456] group-hover:-translate-x-0 group-hover:-translate-y-0" />
