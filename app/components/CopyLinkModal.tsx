@@ -11,17 +11,32 @@ import sendIcon from "@/public/images/sendIcon.svg";
 import slackIcon from "@/public/images/slack2.svg";
 import xIcon from "@/public/images/x.svg";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
 
+import Link from "next/link";
 import { modalStyles } from "../utils/modalStyles";
+import mutations from "../lib/mutation";
 
-const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
+const CopyLinkModal = ({
+  isValidEmail,
+  userEmail,
+}: {
+  isValidEmail: boolean;
+  userEmail: string;
+}) => {
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [url, setUrls] = useState("");
 
-  function openModal() {
+  const openModal = async () => {
     isValidEmail && setIsOpen(true);
-  }
+
+    const result = await mutations.CREATE_OR_UPDATE_WAIT_LIST(userEmail);
+
+    if (result.success) {
+      setUrls(result.waitList.url);
+    }
+  };
 
   function closeModal() {
     setIsOpen(false);
@@ -44,13 +59,16 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
         onRequestClose={closeModal}
         style={modalStyles}
       >
-        <div className="flex flex-col items-center backdrop-filter backdrop-blur-sm w-[504px] p-10 py-8 bg-[#FDFEFE] rounded-lg text-center overflow-hidden relative">
+        <div className="flex flex-col items-center backdrop-filter backdrop-blur-sm md:max-w-[504px] w-full p-10 py-8 bg-[#FDFEFE] rounded-lg text-center overflow-hidden relative">
           <Image
             src={bg}
             alt=""
             className="absolute -top-[50px] left-1/2 transform -translate-x-1/2"
           />
-          <button className="absolute top-6 right-6" onClick={closeModal}>
+          <button
+            className="cursor-pointer absolute top-[24px] right-[24px]"
+            onClick={closeModal}
+          >
             <Image src={closeIcon} alt="close" />
           </button>
           <div className="size-[67px] bg-white rounded-full shadow-md flex items-center justify-center">
@@ -66,24 +84,23 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
               to share your unique link!
             </p>
             <form
-              className="mt-[22px] flex flex-col sm:flex-row gap-2 items-center justify-between"
+              className="mt-[22px] flex flex-row space-x-2 items-center justify-between"
               onSubmit={(e) => e.preventDefault()}
             >
-              <div className="group relative inline-block font-medium">
+              <div className="group relative inline-block font-medium flex-grow md:w-[62%] w-[48%]">
                 <span className="absolute inset-0 h-full w-full translate-x-1 translate-y-1 transform bg-[#e9e5f1] transition duration-200 ease-out group-hover:-translate-x-0 group-hover:-translate-y-0" />
                 <span className="absolute inset-0 h-full w-full border border-[#E4DAF3] bg-[#4e2296] group-hover:bg-[#2d1456]" />
                 <span className="relative font-bold text-white group-hover:text-white">
                   <input
                     type="text"
-                    placeholder="lkb.sdaw1.315461236"
-                    defaultValue="lkb.sdaw1.315461236"
+                    value={url}
                     readOnly
-                    className="h-full px-[17px] py-[10px] font-bold text-[#CEBFE8] border border-[#C4BCCF]"
+                    className="w-full h-full px-[17px] py-[10px] font-bold text-[#CEBFE8] border border-[#C4BCCF] outline-none"
                   />
                 </span>
               </div>
-              <button className="w-full whitespace-nowrap">
-                <div className="w-full flex items-center justify-center">
+              <button className="whitespace-nowrap">
+                <div className="flex items-center justify-center">
                   <div className="relative inline-block px-4 py-2 font-medium group">
                     <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#2d1456] group-hover:-translate-x-0 group-hover:-translate-y-0" />
                     <span className="absolute inset-0 w-full h-full bg-[#4e2296] border border-[#E4DAF3] group-hover:bg-[#2d1456]" />
@@ -105,9 +122,13 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
                 alt=""
                 className="absolute z-10 -top-[25px] left-10 scale-[3] hidden group-hover:block"
               />
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]">
+              <Link
+                href={"https://www.instagram.com/helloalvie.co/"}
+                target="_blank"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]"
+              >
                 <Image src={instagramIcon} alt="Share on Instagram" />
-              </div>
+              </Link>
             </div>
             <div className="group relative">
               <Image
@@ -115,9 +136,15 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
                 alt=""
                 className="absolute z-10 -top-[25px] left-10 scale-[3] hidden group-hover:block"
               />
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]">
+              <Link
+                href={
+                  "https://www.linkedin.com/company/hello-alvie/?viewAsMember=true"
+                }
+                target="_blank"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]"
+              >
                 <Image src={linkedInIcon} alt="Share on LinkedIn" />
-              </div>
+              </Link>
             </div>
             <div className="group relative">
               <Image
@@ -125,9 +152,15 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
                 alt=""
                 className="absolute z-10 -top-[25px] left-10 scale-[3] hidden group-hover:block"
               />
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]">
+              <Link
+                href={
+                  "https://join.slack.com/share/enQtNjg0MDc1NDI1NzY4MC05NGU2ZmY2MDdhY2EzMjAyZjU4NWE5NTZiN2YyODVhMGI1Y2ZhOTI2MTJkOTg1MzFjNjA0ZmU5ZDMxNTlkMjFl"
+                }
+                target="_blank"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]"
+              >
                 <Image src={slackIcon} alt="Share on Slack" />
-              </div>
+              </Link>
             </div>
             <div className="group relative">
               <Image
@@ -135,9 +168,13 @@ const CopyLinkModal = ({ isValidEmail }: { isValidEmail: boolean }) => {
                 alt=""
                 className="absolute z-10 -top-[25px] left-10 scale-[3] hidden group-hover:block"
               />
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]">
+              <Link
+                href={"https://twitter.com/helloalvie"}
+                target="_blank"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white drop-shadow-lg group-hover:border group-hover:border-[#7840D4]"
+              >
                 <Image src={xIcon} alt="Share on X" />
-              </div>
+              </Link>
             </div>
           </div>
           <div className="mt-9">
